@@ -26,16 +26,15 @@ def save_users():
 load_users()
 
 async def start(update: Update, context):
-    user_id = str(update.effective_user.id)  # ID ni string formatga o‘tkazamiz
+    user_id = str(update.effective_user.id)
     username = update.effective_user.username
     name = update.effective_user.first_name
 
-    # Agar foydalanuvchi ro‘yxatda bo‘lmasa, qo‘shamiz
     if user_id not in users:
         users[user_id] = {
             'username': username,
             'name': name,
-            'lang': "en-uz"  # Default tarjima tili
+            'lang': "en-uz"
         }
         save_users()
 
@@ -68,7 +67,7 @@ async def button(update: Update, context):
     user_id = str(query.from_user.id)
 
     if query.data in ["en-uz", "uz-en", "ru-uz", "uz-ru", "ru-en", "en-ru"]:
-        users[user_id]["lang"] = query.data  # Har bir foydalanuvchi uchun alohida til saqlaymiz
+        users[user_id]["lang"] = query.data
         save_users()
         await query.edit_message_text(f"{query.data} tanlandi. Tarjima qilinadigan matnni kiriting:")
     else:
@@ -80,12 +79,10 @@ async def change_language(update: Update, context):
 async def translate_text(update: Update, context):
     user_id = str(update.effective_user.id)
 
-    # Foydalanuvchining tanlagan tilini olish
     current_lang = users.get(user_id, {}).get("lang", "en-uz")
 
     user_input = update.message.text
     try:
-        # Manba va maqsad tilni aniqlash
         lang_mapping = {
             "en-uz": "uz",
             "uz-en": "en",
@@ -96,7 +93,6 @@ async def translate_text(update: Update, context):
         }
         target_lang = lang_mapping.get(current_lang, "uz")  # Default til uzbek
 
-        # Tarjima qilish
         tarjima = GoogleTranslator(source='auto', target=target_lang).translate(user_input)
         await update.message.reply_text(tarjima)
     except Exception:
@@ -105,8 +101,7 @@ async def translate_text(update: Update, context):
 async def users_list(update: Update, context):
     user_id = update.effective_user.id
 
-    # Faqat admin foydalanuvchi uchun
-    if user_id == 5061909214:  # O‘z ID’ingizni yozing
+    if user_id == 5061909214:
         if not users:
             await update.message.reply_text("Hech qanday foydalanuvchi ro'yxatda yo'q.")
             return
@@ -125,7 +120,7 @@ if __name__ == '__main__':
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("user_id", user_id_command))
     application.add_handler(CommandHandler("change_lang", change_language))
-    application.add_handler(CommandHandler("users", users_list))  # /users buyrug'i
+    application.add_handler(CommandHandler("users", users_list))
     application.add_handler(CallbackQueryHandler(button))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, translate_text))
 
