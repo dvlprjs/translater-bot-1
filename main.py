@@ -8,6 +8,7 @@ from deep_translator import GoogleTranslator
 load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+ADMIN_ID = int(os.getenv("ADMIN_ID"))
 
 users = {}
 
@@ -101,7 +102,7 @@ async def translate_text(update: Update, context):
 async def users_list(update: Update, context):
     user_id = update.effective_user.id
 
-    if user_id == 5061909214:
+    if user_id == ADMIN_ID:
         if not users:
             await update.message.reply_text("Hech qanday foydalanuvchi ro'yxatda yo'q.")
             return
